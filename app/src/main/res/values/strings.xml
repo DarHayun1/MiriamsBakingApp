@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">Miriam\'s Baking App</string>
+    <string name="detail_name_label">Name:</string>
+    <string name="detail_servings_label">Servings:</string>
+    <string name="ingredients_label">Ingredients</string>
+    <string name="default_ingredients_text">No Ingredients found</string>
+    <string name="steps_label">Steps</string>
+    <string name="default_step_info">No step information</string>
+    <string name="next_button">Next</string>
+    <string name="previous_button">Previous</string>
+    <string name="appwidget_text">EXAMPLE</string>
+    <string name="add_widget">Add widget</string>
+    <string name="no_recipe_selected">No Recipe Selected</string>
+</resources>
