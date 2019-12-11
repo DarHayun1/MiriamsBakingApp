@@ -1,12 +1,12 @@
 package com.example.android.miriamsbakingapp.ui;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.FragmentManager;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentManager;
 
 import com.example.android.miriamsbakingapp.Objects.Recipe;
 import com.example.android.miriamsbakingapp.R;
@@ -42,6 +42,7 @@ public class RecipeDetailActivity extends AppCompatActivity implements RecipeDet
                 mTwoPane = true;
                 Recipe.Step[] steps = mRecipe.getmSteps();
 
+                Log.d(TAG, "             RecipeDetail O:         ");
                 StepFragment stepFragment = new StepFragment();
                 stepFragment.setContent(steps[mStepPos].getDescription(),
                         steps[mStepPos].getVideoUrl());

@@ -14,7 +14,6 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.example.android.miriamsbakingapp.R;
-import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.source.MediaSource;
@@ -29,17 +28,24 @@ public class StepFragment extends Fragment {
 
 
     private static final String TAG = StepFragment.class.getSimpleName();
+    public static final String EXTRA_PLAY_WHEN_READY = "extra_play_when_ready";
+    public static final String EXTRA_PLAYER_POS = "extra_player_pos";
+    private static final String EXTRA_VIDEO_URL = "extra_video_url";
+    private static final String EXTRA_DESCRIPTION = "extra_desc";
+
     private String mDescription;
     private String mVideoUrl;
+    private SimpleExoPlayer mSimpleExoPlayer;
+    private Context mContext;
+
+    private boolean mIsPlayWhenReady = false;
+    private long mPlayerPos = 0;
 
     private PlayerView mPlayerView;
     private TextView mDescriptionTv;
-    private SimpleExoPlayer mSimpleExoPlayer;
-    private Context mContext;
     private ImageView mDefaultImgIv;
     private TextView mStepNumTv;
-    public static final String EXTRA_PLAY_WHEN_READY = "extra_play_when_ready";
-    public static final String EXTRA_PLAYER_POS = "extra_player_pos";
+
 
 
     public StepFragment() {
@@ -49,10 +55,13 @@ public class StepFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.d(TAG, "       onCreate(Fragment)!! From:        " + getActivity().getClass().getSimpleName());
         if (savedInstanceState != null)
         {
             mPlayerPos = savedInstanceState.getLong(EXTRA_PLAYER_POS);
-            Log.d(TAG, "       onCreate!! :            " + mPlayerPos);
+            mDescription = savedInstanceState.getString(EXTRA_DESCRIPTION);
+            mVideoUrl = savedInstanceState.getString(EXTRA_VIDEO_URL);
+            mIsPlayWhenReady = savedInstanceState.getBoolean(EXTRA_PLAY_WHEN_READY);
         }
     }
 
@@ -69,6 +78,7 @@ public class StepFragment extends Fragment {
         mStepNumTv = (TextView) rootView.findViewById(R.id.step_num_full_desc_tv);
         mContext = getActivity().getApplicationContext();
 
+        Log.d(TAG, "                 onCreateView:             " + mPlayerPos);
         if (mDescription != null && mDescription.substring(1, 3).equals(". ")) {
             String stepNumText = "Step #" + mDescription.substring(0, 1);
             mStepNumTv.setText(stepNumText);
@@ -77,11 +87,6 @@ public class StepFragment extends Fragment {
         }
         mDescriptionTv.setText(mDescription);
 
-        if (savedInstanceState != null){
-            mPlayerPos = savedInstanceState.getLong(EXTRA_PLAYER_POS);
-            Log.d(TAG, "                 POS:             " + mPlayerPos);
-            mIsPlayWhenReady = savedInstanceState.getBoolean(EXTRA_PLAY_WHEN_READY);
-        }
         return rootView;
     }
 
@@ -90,7 +95,7 @@ public class StepFragment extends Fragment {
     public void onStart() {
         super.onStart();
         if (Util.SDK_INT >= 24) {
-            Log.d(TAG, "           onStart:    " + mPlayerPos);
+            Log.d(TAG, "           onStart:      " + mPlayerPos);
             initializePlayer();
         }
     }
@@ -99,7 +104,7 @@ public class StepFragment extends Fragment {
     public void onResume() {
         super.onResume();
         if ((Util.SDK_INT < 24 || mSimpleExoPlayer == null)) {
-            Log.d(TAG, "           onResume:    " + mPlayerPos);
+            Log.d(TAG, "           onResume:      " + mPlayerPos);
             initializePlayer();
         }
     }
@@ -107,6 +112,7 @@ public class StepFragment extends Fragment {
     public void setContent(String description, String videoUrl) {
         mDescription = description;
         mVideoUrl = videoUrl;
+        Log.d(TAG, "            setContent         ");
     }
 
     @Override
@@ -114,11 +120,12 @@ public class StepFragment extends Fragment {
         Log.d(TAG, "             Setting the position:  " + mPlayerPos);
         outState.putLong(EXTRA_PLAYER_POS, mPlayerPos);
         outState.putBoolean(EXTRA_PLAY_WHEN_READY, mIsPlayWhenReady);
+        outState.putString(EXTRA_DESCRIPTION, mDescription);
+        outState.putString(EXTRA_VIDEO_URL, mVideoUrl);
+
         super.onSaveInstanceState(outState);
     }
 
-    private boolean mIsPlayWhenReady = false;
-    private long mPlayerPos = 0;
     @Override
     public void onPause() {
         super.onPause();

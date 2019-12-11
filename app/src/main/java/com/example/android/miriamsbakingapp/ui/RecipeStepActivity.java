@@ -18,6 +18,7 @@ public class RecipeStepActivity extends AppCompatActivity {
     public final static String RECIPE_KEY = "recipe_key";
     public final static String POSITION_KEY = "position_key";
     private static final String TAG = RecipeStepActivity.class.getSimpleName();
+    private static final String FRAGMENT_TAG = "fragment_tag";
 
     private Recipe.Step[] mSteps;
     private int mStepPosition;
@@ -39,6 +40,16 @@ public class RecipeStepActivity extends AppCompatActivity {
             mStepPosition = savedInstanceState.getInt(POSITION_KEY, 0);
             mRecipe = savedInstanceState.getParcelable(RECIPE_KEY);
             mSteps = mRecipe.getmSteps();
+
+            FragmentManager fragmentManager = getSupportFragmentManager();
+
+            StepFragment fragment = (StepFragment) fragmentManager.findFragmentByTag(FRAGMENT_TAG);
+
+            fragmentManager.beginTransaction()
+                    .replace(R.id.step_details_container,
+                            fragmentManager.findFragmentByTag(FRAGMENT_TAG),
+                            FRAGMENT_TAG)
+                    .commit();
             Log.d(TAG, "             onCreate(Activity) 222222222222  ");
         } else {
             Intent intent = getIntent();
@@ -51,6 +62,23 @@ public class RecipeStepActivity extends AppCompatActivity {
                 if (intent.hasExtra(POSITION_KEY)) {
                     mStepPosition = intent.getIntExtra(POSITION_KEY, 0);
                 }
+
+                Log.d(TAG, "             onCreate(Activity)creating a fragment  1  ");
+
+                StepFragment stepFragment = new StepFragment();
+                stepFragment.setContent(mSteps[mStepPosition].getDescription(),
+                        mSteps[mStepPosition].getVideoUrl());
+                Log.d(TAG, "             onCreate(Activity)creating a fragment  2  ");
+
+                FragmentManager fragmentManager = getSupportFragmentManager();
+
+                Log.d(TAG, "             onCreate(Activity)creating a fragment  3  ");
+
+                fragmentManager.beginTransaction()
+                        .replace(R.id.step_details_container, stepFragment, FRAGMENT_TAG)
+                        .commit();
+
+                Log.d(TAG, "             onCreate(Activity)creating a fragment  4  ");
             }
         }
 
@@ -59,15 +87,6 @@ public class RecipeStepActivity extends AppCompatActivity {
         if (mStepPosition != 0)
             mPrevButton.setVisibility(View.VISIBLE);
 
-        StepFragment stepFragment = new StepFragment();
-        stepFragment.setContent(mSteps[mStepPosition].getDescription(),
-                mSteps[mStepPosition].getVideoUrl());
-
-        FragmentManager fragmentManager = getSupportFragmentManager();
-
-        fragmentManager.beginTransaction()
-                .replace(R.id.step_details_container, stepFragment)
-                .commit();
 
     }
 
@@ -112,5 +131,12 @@ public class RecipeStepActivity extends AppCompatActivity {
                 .beginTransaction()
                 .replace(R.id.step_details_container, fragment)
                 .commit();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Log.d(TAG, "             onCreate(Activity) 222222222222  ");
+
     }
 }
