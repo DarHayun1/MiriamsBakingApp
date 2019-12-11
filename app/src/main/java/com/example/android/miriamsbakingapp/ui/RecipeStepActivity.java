@@ -90,7 +90,7 @@ public class RecipeStepActivity extends AppCompatActivity {
 
     public void onNextClicked(View view) {
         mStepPosition++;
-        changeFragment();
+        changeStep();
 
         if (mStepPosition + 1 == mSteps.length)
             mNextButton.setVisibility(View.INVISIBLE);
@@ -102,7 +102,7 @@ public class RecipeStepActivity extends AppCompatActivity {
 
         mStepPosition--;
 
-        changeFragment();
+        changeStep();
 
         if (mStepPosition == 0) {
             mPrevButton.setVisibility(View.INVISIBLE);
@@ -110,19 +110,12 @@ public class RecipeStepActivity extends AppCompatActivity {
             mNextButton.setVisibility(View.VISIBLE);
     }
 
-    public void changeFragment() {
-
-        Log.d(TAG, "             ChangeFragment  ");
+    public void changeStep() {
 
         StepFragment fragment = (StepFragment) getSupportFragmentManager().findFragmentByTag(FRAGMENT_TAG);
-        fragment.updateStep(mSteps[mStepPosition].getDescription(),
-                mSteps[mStepPosition].getVideoUrl());
+        if (fragment != null)
+            fragment.updateStep(mSteps[mStepPosition].getDescription(),
+                  mSteps[mStepPosition].getVideoUrl());
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        Log.d(TAG, "             onCreate(Activity) 222222222222  ");
-
-    }
 }
