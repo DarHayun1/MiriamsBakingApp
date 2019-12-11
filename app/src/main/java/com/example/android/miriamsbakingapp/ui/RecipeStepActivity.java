@@ -41,15 +41,6 @@ public class RecipeStepActivity extends AppCompatActivity {
             mRecipe = savedInstanceState.getParcelable(RECIPE_KEY);
             mSteps = mRecipe.getmSteps();
 
-            FragmentManager fragmentManager = getSupportFragmentManager();
-
-            StepFragment fragment = (StepFragment) fragmentManager.findFragmentByTag(FRAGMENT_TAG);
-
-            fragmentManager.beginTransaction()
-                    .replace(R.id.step_details_container,
-                            fragmentManager.findFragmentByTag(FRAGMENT_TAG),
-                            FRAGMENT_TAG)
-                    .commit();
             Log.d(TAG, "             onCreate(Activity) 222222222222  ");
         } else {
             Intent intent = getIntent();
@@ -122,15 +113,10 @@ public class RecipeStepActivity extends AppCompatActivity {
     public void changeFragment() {
 
         Log.d(TAG, "             ChangeFragment  ");
-        StepFragment fragment = new StepFragment();
 
-        fragment.setContent(mSteps[mStepPosition].getDescription(),
+        StepFragment fragment = (StepFragment) getSupportFragmentManager().findFragmentByTag(FRAGMENT_TAG);
+        fragment.updateStep(mSteps[mStepPosition].getDescription(),
                 mSteps[mStepPosition].getVideoUrl());
-
-        getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.step_details_container, fragment)
-                .commit();
     }
 
     @Override

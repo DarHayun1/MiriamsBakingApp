@@ -19,7 +19,6 @@ import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.ProgressiveMediaSource;
 import com.google.android.exoplayer2.ui.PlayerView;
-import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Log;
 import com.google.android.exoplayer2.util.Util;
@@ -45,7 +44,7 @@ public class StepFragment extends Fragment {
     private TextView mDescriptionTv;
     private ImageView mDefaultImgIv;
     private TextView mStepNumTv;
-
+    private DefaultDataSourceFactory mDataSourceFactory;
 
 
     public StepFragment() {
@@ -109,10 +108,29 @@ public class StepFragment extends Fragment {
         }
     }
 
+    private void settingDescTv() {
+        if (mDescription != null && mDescription.substring(1, 3).equals(". ")) {
+            String stepNumText = "Step #" + mDescription.substring(0, 1);
+            mStepNumTv.setText(stepNumText);
+            mStepNumTv.setVisibility(View.VISIBLE);
+            mDescription = mDescription.substring(3).replaceAll("\\.\\s?", "\\.\n");
+        }
+        mDescriptionTv.setText(mDescription);
+    }
+
     public void setContent(String description, String videoUrl) {
         mDescription = description;
         mVideoUrl = videoUrl;
         Log.d(TAG, "            setContent         ");
+    }
+
+    public void updateStep(String description, String videoUrl) {
+
+        setContent(description, videoUrl);
+        mIsPlayWhenReady = false;
+        mPlayerPos = 0;
+        settingDescTv();
+        initializePlayer();
     }
 
     @Override
@@ -146,14 +164,15 @@ public class StepFragment extends Fragment {
 
     private void initializePlayer(){
         if (mVideoUrl != null && !mVideoUrl.trim().isEmpty()) {
-            mSimpleExoPlayer = ExoPlayerFactory.newSimpleInstance(mContext);
-            mPlayerView.setPlayer(mSimpleExoPlayer);
-
-            DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(mContext,
-                    Util.getUserAgent(mContext, "MiriamsBakingApp"));
+            if (mSimpleExoPlayer == null) {
+                mSimpleExoPlayer = ExoPlayerFactory.newSimpleInstance(mContext);
+                mPlayerView.setPlayer(mSimpleExoPlayer);
+                mDataSourceFactory = new DefaultDataSourceFactory(mContext,
+                        Util.getUserAgent(mContext, "MiriamsBakingApp"));
+            }
             // This is the MediaSource representing the media to be played.
             Uri uri = Uri.parse(mVideoUrl);
-            MediaSource videoSource = new ProgressiveMediaSource.Factory(dataSourceFactory)
+            MediaSource videoSource = new ProgressiveMediaSource.Factory(mDataSourceFactory)
                     .createMediaSource(uri);
             // Prepare the player with the source.
             mSimpleExoPlayer.prepare(videoSource);
