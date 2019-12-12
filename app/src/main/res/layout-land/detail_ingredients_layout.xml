@@ -4,12 +4,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="6dp"
-        android:text="@string/ingredients_label"
-        android:textSize="20sp" />
+    <include layout="@layout/ingredients_label_layout" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/ingredients_rv"

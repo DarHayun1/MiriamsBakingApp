@@ -2,7 +2,6 @@ package com.example.android.miriamsbakingapp.ui;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -31,7 +30,6 @@ public class RecipeDetailActivity extends AppCompatActivity implements RecipeDet
         Intent intent = getIntent();
         if (intent.hasExtra(RECIPE_CLICKED)) {
             mRecipe = intent.getParcelableExtra(RECIPE_CLICKED);
-            Log.d(TAG, "                      1                  " + mRecipe.toString());
             if (savedInstanceState == null) {
                 mStepPos = 0;
             } else {
@@ -42,16 +40,17 @@ public class RecipeDetailActivity extends AppCompatActivity implements RecipeDet
                 mTwoPane = true;
                 Recipe.Step[] steps = mRecipe.getmSteps();
 
-                Log.d(TAG, "             RecipeDetail O:         ");
-                StepFragment stepFragment = new StepFragment();
-                stepFragment.setContent(steps[mStepPos].getDescription(),
-                        steps[mStepPos].getVideoUrl());
+                if (savedInstanceState == null) {
 
-                FragmentManager fragmentManager = getSupportFragmentManager();
+                    StepFragment stepFragment = new StepFragment();
+                    stepFragment.setContent(steps[mStepPos].getDescription(),
+                            steps[mStepPos].getVideoUrl());
 
-                fragmentManager.beginTransaction()
-                        .replace(R.id.two_pane_step_container, stepFragment)
-                        .commit();
+                    FragmentManager fragmentManager = getSupportFragmentManager();
+                    fragmentManager.beginTransaction()
+                            .replace(R.id.two_pane_step_container, stepFragment)
+                            .commit();
+                }
             }
         }
     }
@@ -64,7 +63,6 @@ public class RecipeDetailActivity extends AppCompatActivity implements RecipeDet
     @Override
     public void onStepSelected(int position) {
         if (!mTwoPane) {
-            Log.d(TAG, mRecipe.toString());
             Intent intent = new Intent(this, RecipeStepActivity.class);
             intent.putExtra(RecipeStepActivity.RECIPE_KEY, mRecipe);
             intent.putExtra(RecipeStepActivity.POSITION_KEY, position);

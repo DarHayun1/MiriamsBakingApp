@@ -2,13 +2,10 @@ package com.example.android.miriamsbakingapp.ui;
 
 import android.content.Context;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -19,21 +16,19 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.android.miriamsbakingapp.Objects.Recipe;
 import com.example.android.miriamsbakingapp.R;
-import com.example.android.miriamsbakingapp.WidgetUpdateService;
+import com.example.android.miriamsbakingapp.Services.FetchRecipesTask;
+import com.example.android.miriamsbakingapp.Services.OnEventListener;
 import com.example.android.miriamsbakingapp.adapters.RecipesAdapter;
-import com.example.android.miriamsbakingapp.utils.JsonUtils;
-import com.example.android.miriamsbakingapp.utils.NetworkUtils;
 
-import java.io.IOException;
-
-public class RecipesFragment extends Fragment implements RecipesAdapter.ItemClickListener {
+public class RecipesFragment extends Fragment implements RecipesAdapter.ItemClickListener,
+        OnEventListener<Recipe[]> {
 
 
     public static final String RECIPE_CLICKED = "recipe_clicked";
     private static final String TAG = RecipesFragment.class.getSimpleName();
     private RecyclerView mRecipesRv;
     private RecipesAdapter mRecipesAdapter;
-    private Recipe[] mRecipes;
+    public Recipe[] mRecipes;
     private Context mContext;
     private RecyclerView.LayoutManager mLayoutManager;
 
@@ -63,19 +58,16 @@ public class RecipesFragment extends Fragment implements RecipesAdapter.ItemClic
         mRecipesRv.setLayoutManager(mLayoutManager);
         mRecipesRv.setAdapter(mRecipesAdapter);
         mRecipesAdapter.setClickListener(this);
-        new FetchRecipesTask().execute();
 
+        new FetchRecipesTask(this, mContext).execute();
 
         return rootView;
     }
 
+
     @Override
     public void onItemClick(int position) {
         if (mRecipes[position] != null) {
-            Log.d(TAG, "             *****                   Recipe Clicked! (fragment) 1)");
-            WidgetUpdateService.startActionUpdateRecipeWidget(mContext, mRecipes[position]);
-
-            Log.d(TAG, "             *****                   Recipe Clicked! (fragment) 2)");
             Intent intent = new Intent(mContext, RecipeDetailActivity.class);
             intent.putExtra(RECIPE_CLICKED, mRecipes[position]);
             startActivity(intent);
@@ -83,27 +75,14 @@ public class RecipesFragment extends Fragment implements RecipesAdapter.ItemClic
 
     }
 
-    public class FetchRecipesTask extends AsyncTask<String, Void, Recipe[]> {
 
-        @Override
-        protected Recipe[] doInBackground(String... strings) {
+    @Override
+    public void onSuccess(Recipe[] recipes) {
+        mRecipes = recipes;
+        mRecipesAdapter.setRecipesArray(mRecipes);
+    }
 
-            try {
-                String jsonText = NetworkUtils.getRecipesFromHttp();
-                return JsonUtils.getRecipesArray(jsonText);
-            } catch (IOException e) {
-                e.printStackTrace();
-                return null;
-            }
-        }
-
-        @Override
-        protected void onPostExecute(Recipe[] recipes) {
-            if (recipes != null) {
-                mRecipes = recipes;
-                mRecipesAdapter.setRecipesArray(mRecipes);
-            } else Toast.makeText(getContext(),
-                    "No recipes available", Toast.LENGTH_LONG).show();
-        }
+    @Override
+    public void onFailure(Exception e) {
     }
 }

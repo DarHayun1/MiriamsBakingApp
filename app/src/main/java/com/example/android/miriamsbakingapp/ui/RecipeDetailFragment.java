@@ -7,7 +7,9 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -17,17 +19,15 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.android.miriamsbakingapp.Objects.Recipe;
 import com.example.android.miriamsbakingapp.R;
+import com.example.android.miriamsbakingapp.Services.WidgetUpdateService;
 import com.example.android.miriamsbakingapp.adapters.IngredientsAdapter;
 import com.example.android.miriamsbakingapp.adapters.StepsAdapter;
 
-public class RecipeDetailFragment extends Fragment implements StepsAdapter.StepClickListener {
-
-    //TODO: fix the labels text style
+public class RecipeDetailFragment extends Fragment implements StepsAdapter.StepClickListener, View.OnClickListener {
 
     private static final String TAG = RecipeDetailFragment.class.getSimpleName();
 
     private Context mContext;
-    private Recipe mRecipe;
     private TextView mNameTv;
     private StepsAdapter mStepsAdapter;
     private RecyclerView mStepsRv;
@@ -36,8 +36,10 @@ public class RecipeDetailFragment extends Fragment implements StepsAdapter.StepC
     private IngredientsAdapter mIngrAdapter;
     private LinearLayoutManager mIngLayoutManager;
     private TextView mServingsTv;
+    private ImageView mSaveToWidgetIv;
 
     OnStepClickListener mCallback;
+    private Recipe mRecipe;
 
     public interface OnStepClickListener {
         void onStepSelected(int position);
@@ -64,6 +66,14 @@ public class RecipeDetailFragment extends Fragment implements StepsAdapter.StepC
             throw new ClassCastException(context.toString()
                     + " must implement OnStepClickListener");
         }
+    }
+
+    static boolean isTablet(Context context) {
+        boolean xlarge = ((context.getResources().getConfiguration().screenLayout &
+                Configuration.SCREENLAYOUT_SIZE_MASK) == 4);
+        boolean large = ((context.getResources().getConfiguration().screenLayout &
+                Configuration.SCREENLAYOUT_SIZE_MASK) == Configuration.SCREENLAYOUT_SIZE_LARGE);
+        return (xlarge || large);
     }
 
     @Nullable
@@ -102,6 +112,8 @@ public class RecipeDetailFragment extends Fragment implements StepsAdapter.StepC
             mIngLayoutManager = new LinearLayoutManager(mContext, RecyclerView.HORIZONTAL, false);
             mIngredientsRv.setLayoutManager(mIngLayoutManager);
 
+            mSaveToWidgetIv = rootView.findViewById(R.id.save_to_widget_iv);
+            mSaveToWidgetIv.setOnClickListener(this);
 
             mStepsAdapter = new StepsAdapter(mRecipe.getmSteps());
             mStepsRv.setAdapter(mStepsAdapter);
@@ -110,16 +122,17 @@ public class RecipeDetailFragment extends Fragment implements StepsAdapter.StepC
         return rootView;
     }
 
-    public static boolean isTablet(Context context) {
-        boolean xlarge = ((context.getResources().getConfiguration().screenLayout &
-                Configuration.SCREENLAYOUT_SIZE_MASK) == 4);
-        boolean large = ((context.getResources().getConfiguration().screenLayout &
-                Configuration.SCREENLAYOUT_SIZE_MASK) == Configuration.SCREENLAYOUT_SIZE_LARGE);
-        return (xlarge || large);
-    }
-
     @Override
     public void onStepClicked(int position) {
         mCallback.onStepSelected(position);
     }
+
+    @Override
+    public void onClick(View view) {
+        WidgetUpdateService.startActionUpdateRecipeWidget(mContext, mRecipe);
+        Toast.makeText(mContext, "Widget's ingredients list updated", Toast.LENGTH_LONG).show();
+
+    }
+
+
 }

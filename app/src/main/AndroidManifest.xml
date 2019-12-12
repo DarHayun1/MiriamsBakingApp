@@ -23,7 +23,7 @@
                 android:resource="@xml/widget_app_provider_info" />
         </receiver>
 
-        <service android:name=".WidgetUpdateService"/>
+        <service android:name=".Services.WidgetUpdateService" />
 
         <activity android:name=".ui.RecipeStepActivity" />
         <activity android:name=".ui.RecipeDetailActivity" />

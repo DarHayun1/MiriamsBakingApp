@@ -20,7 +20,6 @@ import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.ProgressiveMediaSource;
 import com.google.android.exoplayer2.ui.PlayerView;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
-import com.google.android.exoplayer2.util.Log;
 import com.google.android.exoplayer2.util.Util;
 
 public class StepFragment extends Fragment {
@@ -54,7 +53,6 @@ public class StepFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d(TAG, "       onCreate(Fragment)!! From:        " + getActivity().getClass().getSimpleName());
         if (savedInstanceState != null)
         {
             mPlayerPos = savedInstanceState.getLong(EXTRA_PLAYER_POS);
@@ -77,7 +75,6 @@ public class StepFragment extends Fragment {
         mStepNumTv = (TextView) rootView.findViewById(R.id.step_num_full_desc_tv);
         mContext = getActivity().getApplicationContext();
 
-        Log.d(TAG, "                 onCreateView:             " + mPlayerPos);
         if (mDescription != null && mDescription.substring(1, 3).equals(". ")) {
             String stepNumText = "Step #" + mDescription.substring(0, 1);
             mStepNumTv.setText(stepNumText);
@@ -94,7 +91,6 @@ public class StepFragment extends Fragment {
     public void onStart() {
         super.onStart();
         if (Util.SDK_INT >= 24) {
-            Log.d(TAG, "           onStart:      " + mPlayerPos);
             initializePlayer();
         }
     }
@@ -103,7 +99,6 @@ public class StepFragment extends Fragment {
     public void onResume() {
         super.onResume();
         if ((Util.SDK_INT < 24 || mSimpleExoPlayer == null)) {
-            Log.d(TAG, "           onResume:      " + mPlayerPos);
             initializePlayer();
         }
     }
@@ -121,7 +116,6 @@ public class StepFragment extends Fragment {
     public void setContent(String description, String videoUrl) {
         mDescription = description;
         mVideoUrl = videoUrl;
-        Log.d(TAG, "            setContent         ");
     }
 
     public void updateStep(String description, String videoUrl) {
@@ -135,7 +129,6 @@ public class StepFragment extends Fragment {
 
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
-        Log.d(TAG, "             Setting the position:  " + mPlayerPos);
         outState.putLong(EXTRA_PLAYER_POS, mPlayerPos);
         outState.putBoolean(EXTRA_PLAY_WHEN_READY, mIsPlayWhenReady);
         outState.putString(EXTRA_DESCRIPTION, mDescription);
@@ -147,7 +140,6 @@ public class StepFragment extends Fragment {
     @Override
     public void onPause() {
         super.onPause();
-        Log.d(TAG, "       onPause!! :            " + mPlayerPos);
         if (Util.SDK_INT < 24) {
             releasePlayer();
         }
@@ -156,7 +148,6 @@ public class StepFragment extends Fragment {
     @Override
     public void onStop() {
         super.onStop();
-        Log.d(TAG, "       onStop!! :            " + mPlayerPos);
         if (Util.SDK_INT >= 24) {
             releasePlayer();
         }
@@ -176,10 +167,10 @@ public class StepFragment extends Fragment {
                     .createMediaSource(uri);
             // Prepare the player with the source.
             mSimpleExoPlayer.prepare(videoSource);
-            Log.d(TAG, "           Player SAVED Position:    " + mPlayerPos);
             mSimpleExoPlayer.seekTo(mPlayerPos);
-            Log.d(TAG, "           Player Position:    " + mSimpleExoPlayer.getCurrentPosition());
             mSimpleExoPlayer.setPlayWhenReady(mIsPlayWhenReady);
+            mPlayerView.setVisibility(View.VISIBLE);
+            mDefaultImgIv.setVisibility(View.GONE);
             } else {
                 mPlayerView.setVisibility(View.GONE);
                 mDefaultImgIv.setVisibility(View.VISIBLE);
@@ -196,9 +187,4 @@ public class StepFragment extends Fragment {
         }
     }
 
-    @Override
-    public void onDestroy() {
-        Log.d(TAG, "       onDestroy!! :            " + mPlayerPos);
-        super.onDestroy();
-    }
 }

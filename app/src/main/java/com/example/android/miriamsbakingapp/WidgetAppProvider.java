@@ -3,18 +3,17 @@ package com.example.android.miriamsbakingapp;
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 import android.widget.RemoteViews;
 
 import com.example.android.miriamsbakingapp.Objects.Recipe;
 import com.example.android.miriamsbakingapp.ui.RecipeDetailActivity;
 import com.example.android.miriamsbakingapp.ui.RecipesFragment;
-import com.squareup.picasso.Picasso;
 
-import static com.example.android.miriamsbakingapp.WidgetUpdateService.ACTION_UPDATE_RECIPE;
+import java.text.DecimalFormat;
+
+import static com.example.android.miriamsbakingapp.Services.WidgetUpdateService.ACTION_UPDATE_RECIPE;
 
 /**
  * Implementation of App Widget functionality.
@@ -27,7 +26,18 @@ public class WidgetAppProvider extends AppWidgetProvider {
                                 Recipe recipe, int appWidgetId) {
 
         String recipeName = recipe.getmName();
-        String recipeUrl = recipe.getmImageUrl();
+        Recipe.Ingredient[] recipeIngredients = recipe.getmIngredients();
+
+        DecimalFormat format = new DecimalFormat("0.##");
+        StringBuilder stringBuilder = new StringBuilder();
+        for (int i = 0; i < recipeIngredients.length; i++) {
+            stringBuilder.append(
+                    format.format(recipeIngredients[i].getQuantity()) + " "
+                            + recipeIngredients[i].getMeasure_type() + " - "
+                            + recipeIngredients[i].getIngredient()
+                            + "\n");
+        }
+        String ingredientsText = stringBuilder.toString();
 
         // Construct the RemoteViews object
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget_app_provider);
@@ -36,20 +46,17 @@ public class WidgetAppProvider extends AppWidgetProvider {
         intent.putExtra(RecipesFragment.RECIPE_CLICKED, recipe);
         intent.setAction(ACTION_UPDATE_RECIPE);
 
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
-        views.setOnClickPendingIntent(R.id.widget_iv, pendingIntent);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, recipe.getmId(), intent, 0);
+        views.setOnClickPendingIntent(R.id.widget_container, pendingIntent);
 
-        if (recipeUrl.trim().isEmpty()) {
-            views.setImageViewResource(R.id.widget_iv, R.drawable.default_recipe_img);
+        if (ingredientsText.trim().isEmpty()) {
+            views.setTextViewText(R.id.widget_ingredients_tv,
+                    context.getResources().getString(R.string.default_ingredients_text));
         } else {
-            Picasso.get()
-                    .load(recipeUrl)
-                    .into(views, R.id.widget_iv, appWidgetManager.getAppWidgetIds(
-                            new ComponentName(context, WidgetAppProvider.class)));
+            views.setTextViewText(R.id.widget_ingredients_tv, ingredientsText);
         }
-        Log.d(TAG, "                     ABC                 " + recipeName);
         if (!recipeName.trim().isEmpty())
-            views.setTextViewText(R.id.widget_tv, recipeName);
+            views.setTextViewText(R.id.widget_name_tv, recipeName);
 
         // Instruct the widget manager to update the widget
         appWidgetManager.updateAppWidget(appWidgetId, views);

@@ -2,7 +2,6 @@ package com.example.android.miriamsbakingapp.ui;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
@@ -28,8 +27,6 @@ public class RecipeStepActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Log.d(TAG, "             onCreate(Activity)  ");
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recipe_step);
 
@@ -40,36 +37,25 @@ public class RecipeStepActivity extends AppCompatActivity {
             mStepPosition = savedInstanceState.getInt(POSITION_KEY, 0);
             mRecipe = savedInstanceState.getParcelable(RECIPE_KEY);
             mSteps = mRecipe.getmSteps();
-
-            Log.d(TAG, "             onCreate(Activity) 222222222222  ");
         } else {
             Intent intent = getIntent();
             if (intent != null) {
                 if (intent.hasExtra(RECIPE_KEY)) {
                     mRecipe = intent.getParcelableExtra(RECIPE_KEY);
-                    Log.d(TAG, mRecipe.toString());
                     mSteps = mRecipe.getmSteps();
                 }
                 if (intent.hasExtra(POSITION_KEY)) {
                     mStepPosition = intent.getIntExtra(POSITION_KEY, 0);
                 }
 
-                Log.d(TAG, "             onCreate(Activity)creating a fragment  1  ");
-
                 StepFragment stepFragment = new StepFragment();
                 stepFragment.setContent(mSteps[mStepPosition].getDescription(),
                         mSteps[mStepPosition].getVideoUrl());
-                Log.d(TAG, "             onCreate(Activity)creating a fragment  2  ");
 
                 FragmentManager fragmentManager = getSupportFragmentManager();
-
-                Log.d(TAG, "             onCreate(Activity)creating a fragment  3  ");
-
                 fragmentManager.beginTransaction()
                         .replace(R.id.step_details_container, stepFragment, FRAGMENT_TAG)
                         .commit();
-
-                Log.d(TAG, "             onCreate(Activity)creating a fragment  4  ");
             }
         }
 
@@ -77,7 +63,6 @@ public class RecipeStepActivity extends AppCompatActivity {
             mNextButton.setVisibility(View.VISIBLE);
         if (mStepPosition != 0)
             mPrevButton.setVisibility(View.VISIBLE);
-
 
     }
 

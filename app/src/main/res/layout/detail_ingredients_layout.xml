@@ -5,12 +5,7 @@
     android:layout_weight="2"
     android:orientation="vertical">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="6dp"
-        android:text="@string/ingredients_label"
-        android:textSize="24sp" />
+    <include layout="@layout/ingredients_label_layout" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/ingredients_rv"
@@ -24,5 +19,6 @@
         android:text="@string/default_ingredients_text"
         android:textSize="16sp"
         android:visibility="gone" />
+
 
 </LinearLayout>

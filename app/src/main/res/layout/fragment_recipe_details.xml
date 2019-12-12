@@ -21,8 +21,4 @@
         android:layout_height="0dp"
         android:orientation="vertical"/>
 
-
-
-
-
 </LinearLayout>
